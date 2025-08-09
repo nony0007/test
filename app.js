@@ -69,7 +69,7 @@ function el(tag, attrs={}, children=[]){
   const n = document.createElement(tag);
   for(const [k,v] of Object.entries(attrs)){
     if(k==='class') n.className = v;
-    else if(k.startsWith('on') && typeof v==='function') n.addEventListener(k.substring(2), v);
+    else if(k.toLowerCase().startsWith('on') && typeof v==='function') n.addEventListener(k.substring(2).toLowerCase(), v);
     else if(k==='html') n.innerHTML = v;
     else n.setAttribute(k, v);
   }

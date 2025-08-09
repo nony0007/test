@@ -1,7 +1,7 @@
 {
-  "name": "Formwork Ops Manager v2.1.1",
+  "name": "Formwork Ops Manager v2.1.3",
   "short_name": "FormworkOps",
-  "start_url": "./index.html?v=2.1.1",
+  "start_url": "./index.html?v=2.1.3",
   "display": "standalone",
   "background_color": "#0b0d10",
   "theme_color": "#0b0d10",

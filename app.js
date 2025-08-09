@@ -20,7 +20,7 @@ const routes = {
   checkout: CheckoutView,
   maintenance: MaintenanceView,
   alerts: AlertsView,
-  admin: AdminView,            // <-- fixed: AdminView now defined below
+  admin: AdminView,
   movements: MovementsView
 };
 
@@ -78,7 +78,7 @@ function el(tag, attrs={}, children=[]){
 }
 function panelDialog(title){
   const d = el('div',{class:'panel'});
-  d.appendChild(el('div',{class:'row'},[ el('strong',{},title), el('button',{class:'btn ghost', onClick:()=>d.remove()},'×') ]));
+  d.appendChild(el('div',{class:'row'},[ el('strong',{},title), el('button',{class:'btn ghost', onclick:()=>d.remove()},'×') ]));
   return d;
 }
 function selectSites(db, placeholder, id){ const s = el('select',{class:'select', id}); s.appendChild(el('option',{value:''},placeholder)); db.sites.forEach(x=>s.appendChild(el('option',{value:x.id},x.name))); return s; }
@@ -114,10 +114,10 @@ function InventoryView(db){
       el('input',{class:'input', id:'q', placeholder:'Search (SKU, item, site, bin)'}),
       selectSites(db,'All locations','loc'),
       el('div',{class:'row'},[
-        el('button',{class:'btn', onClick:()=>exportInventory(db)},'Export CSV'),
-        el('button',{class:'btn primary', onClick:()=>openAddStock(db, root)},'Add Stock'),
-        el('button',{class:'btn ghost', onClick:()=>openNewItem(db, root)},'New Item'),
-        el('button',{class:'btn ghost', onClick:()=>openRoleSwitcher(db, root)},'Switch Role'),
+        el('button',{class:'btn', onclick:()=>exportInventory(db)},'Export CSV'),
+        el('button',{class:'btn primary', onclick:()=>openAddStock(db, root)},'Add Stock'),
+        el('button',{class:'btn ghost', onclick:()=>openNewItem(db, root)},'New Item'),
+        el('button',{class:'btn ghost', onclick:()=>openRoleSwitcher(db, root)},'Switch Role'),
       ])
     ])
   ]);
@@ -147,7 +147,7 @@ function InventoryView(db){
         el('td',{},siteName(db,r.location)),
         el('td',{},r.bin||'-'),
         el('td',{},String(r.qty)),
-        el('td',{},[el('button',{class:'btn small', onClick:()=>openQrLabel({sku:r.sku, location:r.location, bin:r.bin})},'Label')])
+        el('td',{},[el('button',{class:'btn small', onclick:()=>openQrLabel({sku:r.sku, location:r.location, bin:r.bin})},'Label')])
       ]);
       tbody.appendChild(tr);
     });
@@ -168,7 +168,7 @@ function openRoleSwitcher(db, mount){
   sel.value = db.role || 'Yard';
   dlg.appendChild(sel);
   dlg.appendChild(el('div',{class:'row'},[
-    el('button',{class:'btn primary', onClick:()=>{ db.role = sel.value; setDB(db); drawNav(); dlg.remove(); render(); }},'Apply')
+    el('button',{class:'btn primary', onclick:()=>{ db.role = sel.value; setDB(db); drawNav(); dlg.remove(); render(); }},'Apply')
   ]));
   mount.appendChild(dlg);
 }
@@ -182,12 +182,12 @@ function openNewItem(db, mount){
   dlg.appendChild(el('div',{class:'grid cols-2'},[sku,name]));
   dlg.appendChild(el('div',{class:'grid cols-2'},[cat,unit]));
   dlg.appendChild(el('div',{class:'row'},[
-    el('button',{class:'btn primary', onClick:()=>{
+    el('button',{class:'btn primary', onclick:()=>{
       if(!sku.value) return alert('SKU required');
       db.items.push({sku:sku.value,name:name.value,category:cat.value,unit:unit.value||'piece'});
       setDB(db); dlg.remove(); render();
     }},'Create'),
-    el('button',{class:'btn ghost', onClick:()=>dlg.remove()},'Close')
+    el('button',{class:'btn ghost', onclick:()=>dlg.remove()},'Close')
   ]));
   mount.appendChild(dlg);
 }
@@ -201,7 +201,7 @@ function openAddStock(db, mount){
   dlg.appendChild(el('div',{class:'grid cols-2'},[sku,loc]));
   dlg.appendChild(el('div',{class:'grid cols-2'},[bin,qty]));
   dlg.appendChild(el('div',{class:'row'},[
-    el('button',{class:'btn primary', onClick:()=>{
+    el('button',{class:'btn primary', onclick:()=>{
       const s=sku.value, l=loc.value, q=Math.max(1,parseInt(qty.value||'0',10));
       if(!s||!l) return alert('Pick SKU and Location');
       const i = db.stock.findIndex(x=>x.sku===s && x.location===l && (x.bin||'')===(bin.value||''));
@@ -209,7 +209,7 @@ function openAddStock(db, mount){
       addMovement(db,{type:'IN',sku:s,qty:q,to:l,ref:'manual-add'});
       setDB(db); dlg.remove(); render();
     }},'Add'),
-    el('button',{class:'btn ghost', onClick:()=>dlg.remove()},'Close')
+    el('button',{class:'btn ghost', onclick:()=>dlg.remove()},'Close')
   ]));
   mount.appendChild(dlg);
 }
@@ -226,8 +226,8 @@ function PalletsView(db){
   const root = el('div',{class:'grid'});
   const header = el('div',{class:'panel'},[
     el('div',{class:'row'},[
-      el('button',{class:'btn primary', onClick:()=>openNewPallet(db, root)},'Create Pallet'),
-      el('button',{class:'btn', onClick:()=>openScanner(text=>handleScanPallet(db,text))},'Scan Pallet/Item')
+      el('button',{class:'btn primary', onclick:()=>openNewPallet(db, root)},'Create Pallet'),
+      el('button',{class:'btn', onclick:()=>openScanner(text=>handleScanPallet(db,text))},'Scan Pallet/Item')
     ])
   ]);
   root.appendChild(header);
@@ -240,7 +240,7 @@ function PalletsView(db){
       el('td',{},p.id),
       el('td',{},siteName(db,p.location)),
       el('td',{},lines),
-      el('td',{},[el('button',{class:'btn small', onClick:()=>openQrLabel({pallet:p.id})},'Label')])
+      el('td',{},[el('button',{class:'btn small', onclick:()=>openQrLabel({pallet:p.id})},'Label')])
     ]);
     tbody.appendChild(row);
   });
@@ -256,16 +256,16 @@ function openNewPallet(db, mount){
   function addRow(){
     const sku = selectItems(db,'Item','sku');
     const qty = el('input',{class:'input', type:'number', min:'1', value:'1'});
-    const row = el('div',{class:'grid cols-3'},[sku,qty,el('button',{class:'btn ghost', onClick:()=>row.remove()},'Remove')]);
+    const row = el('div',{class:'grid cols-3'},[sku,qty,el('button',{class:'btn ghost', onclick:()=>row.remove()},'Remove')]);
     linesBox.appendChild(row);
   }
   addRow();
   dlg.appendChild(el('div',{},'ID: '+id));
   dlg.appendChild(loc);
   dlg.appendChild(linesBox);
-  dlg.appendChild(el('button',{class:'btn', onClick:addRow},'Add Line'));
+  dlg.appendChild(el('button',{class:'btn', onclick:addRow},'Add Line'));
   dlg.appendChild(el('div',{class:'row'},[
-    el('button',{class:'btn primary', onClick:()=>{
+    el('button',{class:'btn primary', onclick:()=>{
       if(!loc.value) return alert('Choose location');
       const lines = [...linesBox.querySelectorAll('div.grid.cols-3')].map(div=>{
         const s = div.querySelector('select').value;
@@ -294,9 +294,9 @@ function TransfersView(db){
   root.appendChild(kpis(db));
   const panel = el('div',{class:'panel'},[
     el('div',{class:'row'},[
-      el('button',{class:'btn', onClick:()=>openScanner(data=>handleScanTransfer(db,data))},'Open Scanner'),
-      el('button',{class:'btn primary', onClick:()=>openNewTransfer(db, root)},'New Transfer'),
-      el('button',{class:'btn ghost', onClick:()=>openBulkCSV(db)},'Bulk CSV')
+      el('button',{class:'btn', onclick:()=>openScanner(data=>handleScanTransfer(db,data))},'Open Scanner'),
+      el('button',{class:'btn primary', onclick:()=>openNewTransfer(db, root)},'New Transfer'),
+      el('button',{class:'btn ghost', onclick:()=>openBulkCSV(db)},'Bulk CSV')
     ])
   ]);
   root.appendChild(panel);
@@ -317,8 +317,8 @@ function renderTransfersTable(db){
       el('td',{},lines||'-'),
       el('td',{},el('span',{class:'badge'},tr.status)),
       el('td',{},[
-        el('button',{class:'btn small', onClick:()=>progressTransfer(db,tr.id)},'Advance'),
-        el('button',{class:'btn small ghost', onClick:()=>openQrLabel({transfer:tr.id})},'QR')
+        el('button',{class:'btn small', onclick:()=>progressTransfer(db,tr.id)},'Advance'),
+        el('button',{class:'btn small ghost', onclick:()=>openQrLabel({transfer:tr.id})},'QR')
       ])
     ]);
     tbody.appendChild(row);
@@ -361,15 +361,15 @@ function openNewTransfer(db, mount){
   function addLineRow(){
     const sku = selectItems(db,'Item','sku');
     const qty = el('input',{class:'input', type:'number', min:'1', placeholder:'Qty', value:'1'});
-    const row = el('div',{class:'grid cols-3'},[sku, qty, el('button',{class:'btn ghost', onClick:()=>row.remove()},'Remove')]);
+    const row = el('div',{class:'grid cols-3'},[sku, qty, el('button',{class:'btn ghost', onclick:()=>row.remove()},'Remove')]);
     linesBox.appendChild(row);
   }
   addLineRow();
   dlg.appendChild(el('div',{class:'grid cols-2'},[from,to]));
   dlg.appendChild(linesBox);
-  dlg.appendChild(el('button',{class:'btn', onClick:addLineRow},'Add Line'));
+  dlg.appendChild(el('button',{class:'btn', onclick:addLineRow},'Add Line'));
   dlg.appendChild(el('div',{class:'row'},[
-    el('button',{class:'btn primary', onClick:()=>{
+    el('button',{class:'btn primary', onclick:()=>{
       if(!from.value || !to.value || from.value===to.value) return alert('Pick different From/To');
       const lines = [...linesBox.querySelectorAll('div.grid.cols-3')].map(div=>{
         const s = div.querySelector('select').value;
@@ -381,7 +381,7 @@ function openNewTransfer(db, mount){
       db.transfers.push({id, from:from.value, to:to.value, lines, status:'Draft'});
       setDB(db); dlg.remove(); render();
     }},'Create'),
-    el('button',{class:'btn ghost', onClick:()=>dlg.remove()},'Close')
+    el('button',{class:'btn ghost', onclick:()=>dlg.remove()},'Close')
   ]));
   mount.appendChild(dlg);
 }
@@ -421,8 +421,8 @@ function DeliveriesView(db){
   const root = el('div',{class:'grid'});
   const panel = el('div',{class:'panel'},[
     el('div',{class:'row'},[
-      el('button',{class:'btn primary', onClick:()=>openNewDelivery(db, root)},'New Delivery'),
-      el('button',{class:'btn', onClick:()=>openScanner(data=>handleScanDelivery(db,data))},'Start Receiving')
+      el('button',{class:'btn primary', onclick:()=>openNewDelivery(db, root)},'New Delivery'),
+      el('button',{class:'btn', onclick:()=>openScanner(data=>handleScanDelivery(db,data))},'Start Receiving')
     ])
   ]);
   root.appendChild(panel);
@@ -438,8 +438,8 @@ function DeliveriesView(db){
       el('td',{},lines||'-'),
       el('td',{},el('span',{class:'badge'},d.status)),
       el('td',{},[
-        el('button',{class:'btn small', onClick:()=>receiveDelivery(db,d.id)},'Receive'),
-        el('button',{class:'btn small ghost', onClick:()=>openQrLabel({docket:d.id})},'QR')
+        el('button',{class:'btn small', onclick:()=>receiveDelivery(db,d.id)},'Receive'),
+        el('button',{class:'btn small ghost', onclick:()=>openQrLabel({docket:d.id})},'QR')
       ])
     ]);
     tbody.appendChild(row);
@@ -456,15 +456,15 @@ function openNewDelivery(db, mount){
   function addRow(){
     const sku = selectItems(db,'Item','sku');
     const exp = el('input',{class:'input', type:'number', min:'1', value:'1', placeholder:'Expected'});
-    const row = el('div',{class:'grid cols-3'},[sku,exp,el('button',{class:'btn ghost', onClick:()=>row.remove()},'Remove')]);
+    const row = el('div',{class:'grid cols-3'},[sku,exp,el('button',{class:'btn ghost', onclick:()=>row.remove()},'Remove')]);
     linesBox.appendChild(row);
   }
   addRow();
   dlg.appendChild(el('div',{class:'grid cols-2'},[to,supplier]));
   dlg.appendChild(linesBox);
-  dlg.appendChild(el('button',{class:'btn', onClick:addRow},'Add Line'));
+  dlg.appendChild(el('button',{class:'btn', onclick:addRow},'Add Line'));
   dlg.appendChild(el('div',{class:'row'},[
-    el('button',{class:'btn primary', onClick:()=>{
+    el('button',{class:'btn primary', onclick:()=>{
       if(!to.value) return alert('Choose site');
       const lines = [...linesBox.querySelectorAll('div.grid.cols-3')].map(div=>{
         const s = div.querySelector('select').value;
@@ -475,7 +475,7 @@ function openNewDelivery(db, mount){
       db.deliveries.push({id,to:to.value,supplier:supplier.value,lines,status:'Pending'});
       setDB(db); dlg.remove(); render();
     }},'Create'),
-    el('button',{class:'btn ghost', onClick:()=>dlg.remove()},'Close')
+    el('button',{class:'btn ghost', onclick:()=>dlg.remove()},'Close')
   ]));
   mount.appendChild(dlg);
 }
@@ -490,7 +490,7 @@ function receiveDelivery(db, id){
     dlg.appendChild(el('div',{class:'grid cols-3'},[ el('div',{},l.sku), el('div',{},`Expected ${l.expected}`), input ]));
   });
   dlg.appendChild(el('div',{class:'row'},[
-    el('button',{class:'btn primary', onClick:()=>{
+    el('button',{class:'btn primary', onclick:()=>{
       d.lines.forEach(l=>{
         const diff = Math.max(0,(l.received||0));
         if(diff>0){ addStock(db,l.sku,d.to,diff); addMovement(db,{type:'IN',sku:l.sku,qty:diff,to:d.to,ref:d.id}); }
@@ -531,7 +531,26 @@ function computeAlerts(db){
   return list;
 }
 
-// Checkout
+// Checkout + New Person
+function openNewPerson(db, mount){
+  const dlg = panelDialog('Add Person');
+  const name = el('input',{class:'input', placeholder:'Full name'});
+  const trade = el('input',{class:'input', placeholder:'Trade (Carpenter, Steel Fixer, Concrete...)'});
+  dlg.appendChild(el('div',{class:'grid cols-2'},[name, trade]));
+  dlg.appendChild(el('div',{class:'row'},[
+    el('button',{class:'btn primary', onclick:()=>{
+      if(!name.value.trim()) return alert('Name required');
+      const id = 'P-' + Date.now().toString().slice(-6);
+      db.people.push({ id, name: name.value.trim(), trade: trade.value.trim() });
+      setDB(db);
+      dlg.remove();
+      render();
+    }},'Save'),
+    el('button',{class:'btn ghost', onclick:()=>dlg.remove()},'Cancel')
+  ]));
+  mount.appendChild(dlg);
+}
+
 function CheckoutView(db){
   const root = el('div',{class:'grid'});
   const panel = el('div',{class:'panel'},[
@@ -541,8 +560,12 @@ function CheckoutView(db){
       el('input',{class:'date', type:'date', id:'due'})
     ]),
     el('div',{class:'row'},[
+      el('button',{class:'btn ghost', onclick:()=>openNewPerson(db, root)},'New Person'),
+      el('span',{class:'badge'},'or select an existing person')
+    ]),
+    el('div',{class:'row'},[
       el('input',{class:'input', type:'number', min:'1', id:'qty', value:'1', placeholder:'Qty'}),
-      el('button',{class:'btn primary', onClick:()=>{
+      el('button',{class:'btn primary', onclick:()=>{
         const p = panel.querySelector('#person').value;
         const s = panel.querySelector('#sku').value;
         const q = Math.max(1, parseInt(panel.querySelector('#qty').value||'0',10));
@@ -559,6 +582,7 @@ function CheckoutView(db){
     ])
   ]);
   root.appendChild(panel);
+
   const table = el('table',{class:'table'});
   table.innerHTML = `<thead><tr><th>ID</th><th>Person</th><th>Items</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody>`;
   const tbody = table.querySelector('tbody');
@@ -568,8 +592,8 @@ function CheckoutView(db){
       el('td',{},c.id), el('td',{},personName(db,c.personId)), el('td',{},items),
       el('td',{},c.due||'-'), el('td',{},el('span',{class:'badge'},c.status)),
       el('td',{},[
-        el('button',{class:'btn small', onClick:()=>returnCheckout(db,c.id)},'Return'),
-        el('button',{class:'btn small warn', onClick:()=>flagDamaged(db,c.id)},'Damaged')
+        el('button',{class:'btn small', onclick:()=>returnCheckout(db,c.id)},'Return'),
+        el('button',{class:'btn small warn', onclick:()=>flagDamaged(db,c.id)},'Damaged')
       ])
     ]);
     tbody.appendChild(row);
@@ -593,9 +617,9 @@ function MaintenanceView(db){
   const root = el('div',{class:'grid'});
   root.appendChild(el('div',{class:'panel'},[
     el('div',{class:'row'},[
-      el('button',{class:'btn', onClick:()=>alert('Inspections list coming soon')},'Inspections'),
-      el('button',{class:'btn', onClick:()=>alert('Service planner coming soon')},'Service Planner'),
-      el('button',{class:'btn', onClick:()=>uploadDoc()},'Upload MSDS')
+      el('button',{class:'btn', onclick:()=>alert('Inspections list coming soon')},'Inspections'),
+      el('button',{class:'btn', onclick:()=>alert('Service planner coming soon')},'Service Planner'),
+      el('button',{class:'btn', onclick:()=>uploadDoc()},'Upload MSDS')
     ])
   ]));
   const table = el('table',{class:'table'});
@@ -609,27 +633,27 @@ function MaintenanceView(db){
   function uploadDoc(){ const i = document.createElement('input'); i.type = 'file'; i.onchange = ()=>alert('Document uploaded (demo)'); i.click(); }
 }
 
-// Admin (NEW)
+// Admin
 function AdminView(db){
   const root = el('div',{class:'grid'});
   root.appendChild(el('div',{class:'panel'},[
     el('h3',{},'Admin & Data'),
     el('p',{},'Backup or restore your local data, reset to demo, or print QR labels.'),
     el('div',{class:'row'},[
-      el('button',{class:'btn', onClick:backupDB},'Backup'),
-      el('button',{class:'btn', onClick:()=>document.getElementById('btn-restore').click()},'Restore'),
-      el('button',{class:'btn danger', onClick:()=>{ if(confirm('Reset local data to demo seed?')){ resetDB(); location.reload(); } }},'Reset Demo')
+      el('button',{class:'btn', onclick:backupDB},'Backup'),
+      el('button',{class:'btn', onclick:()=>document.getElementById('btn-restore').click()},'Restore'),
+      el('button',{class:'btn danger', onclick:()=>{ if(confirm('Reset local data to demo seed?')){ resetDB(); location.reload(); } }},'Reset Demo')
     ]),
     el('hr',{class:'sep'}),
     el('h4',{},'Generate QR'),
     el('div',{class:'row'},[
-      el('button',{class:'btn ghost', onClick:()=>openQrLabel({sku:'DK-FRMX-120x270',location:'Y1',bin:'B-001'})},'Sample Item QR'),
-      el('button',{class:'btn ghost', onClick:()=>openQrLabel({pallet:'PAL-0001'})},'Sample Pallet QR'),
-      el('button',{class:'btn ghost', onClick:()=>openQrLabel({docket:'D-123456'})},'Sample Docket QR')
+      el('button',{class:'btn ghost', onclick:()=>openQrLabel({sku:'DK-FRMX-120x270',location:'Y1',bin:'B-001'})},'Sample Item QR'),
+      el('button',{class:'btn ghost', onclick:()=>openQrLabel({pallet:'PAL-0001'})},'Sample Pallet QR'),
+      el('button',{class:'btn ghost', onclick:()=>openQrLabel({docket:'D-123456'})},'Sample Docket QR')
     ]),
     el('hr',{class:'sep'}),
     el('h4',{},'About'),
-    el('p',{},'Formwork Ops v2.1 — static PWA running on GitHub Pages.')
+    el('p',{},'Formwork Ops v2.1.4 — static PWA running on GitHub Pages.')
   ]));
   return root;
 }
@@ -656,22 +680,35 @@ function MovementsView(db){
   return root;
 }
 
-// QR helpers
+// QR
 function openQrLabel(payload){
   const dlg = panelDialog('QR Label');
-  const canvas = el('canvas',{width:'180', height:'180'});
+  const canvas = el('canvas',{width:'240', height:'240'});
   dlg.appendChild(canvas);
   dlg.appendChild(el('div',{class:'small'},JSON.stringify(payload)));
-  dlg.appendChild(el('div',{class:'row'},[ el('button',{class:'btn ghost', onClick:()=>window.print()},'Print'), el('button',{class:'btn', onClick:()=>dlg.remove()},'Close') ]));
+  dlg.appendChild(el('div',{class:'row'},[ el('button',{class:'btn ghost', onclick:()=>window.print()},'Print'), el('button',{class:'btn', onclick:()=>dlg.remove()},'Close') ]));
   app.prepend(dlg);
-  QRCode.toCanvas(canvas, JSON.stringify(payload), {width:180}, err=>{ if(err) console.error(err); });
+
+  const draw = ()=>{
+    try{
+      const data = JSON.stringify(payload);
+      if (window.QRCode && typeof window.QRCode.toCanvas === 'function') {
+        window.QRCode.toCanvas(canvas, data, {width:240}, err=>{ if(err) console.error(err); });
+      } else if (window.QRCode && typeof window.QRCode === 'function') {
+        const box = document.createElement('div'); canvas.replaceWith(box);
+        new window.QRCode(box, { text: data, width: 240, height: 240 });
+      } else { console.warn('QR lib not ready'); }
+    } catch(e) { console.error(e); }
+  };
+  if (window.QRCode) draw();
+  else { const s = document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js'; s.onload=draw; document.head.appendChild(s); }
 }
 function openScanner(onResult){
   const dlg = panelDialog('Scanner');
   const div = el('div',{id:'reader'});
   const log = el('pre',{class:'code'},'Waiting for camera...');
   dlg.appendChild(div); dlg.appendChild(log);
-  dlg.appendChild(el('div',{class:'row'},[ el('button',{class:'btn ghost', onClick:stop},'Close') ]));
+  dlg.appendChild(el('div',{class:'row'},[ el('button',{class:'btn ghost', onclick:stop},'Close') ]));
   app.prepend(dlg);
   const h = new Html5Qrcode('reader');
   const config = { fps:10, qrbox:250, rememberLastUsedCamera:true };
@@ -683,10 +720,7 @@ function openScanner(onResult){
 
 // CSV + stock ops
 function downloadCSV(filename, rows){
-  const csv = rows.map(r=>r.map(cell=>{
-    const s = String(cell).replace(/\"/g,'\"\"');
-    return /,|\\n/.test(s) ? `\"${s}\"` : s;
-  }).join(',')).join('\\n');
+  const csv = rows.map(r=>r.map(cell=>{ const s = String(cell).replace(/\"/g,'\"\"'); return /,|\n/.test(s) ? `\"${s}\"` : s; }).join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
@@ -719,6 +753,6 @@ function addMovement(db, m){ db.movements.push({ts:Date.now(), ...m}); setDB(db)
     const db = ensureDB();
     const total = db.stock.reduce((a,b)=>a+b.qty,0);
     console.assert(total>0, 'stock should not be empty');
-    console.log('[FOPS v2.1] self-tests OK');
-  }catch(e){ console.warn('[FOPS v2.1] tests failed', e); }
+    console.log('[FOPS v2.1.4] self-tests OK');
+  }catch(e){ console.warn('[FOPS v2.1.4] tests failed', e); }
 })();
